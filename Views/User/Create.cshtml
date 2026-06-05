@@ -1,0 +1,50 @@
+@model MyClothShopManagement.Models.ViewModels.UserViewModel
+@{
+    ViewBag.Title = "Add New User";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="font-weight-bold mb-0"><i class="fas fa-user-plus mr-2 text-primary"></i>Add New User</h4>
+    @Html.ActionLink("← Back", "Index", "User", null, new { @class = "btn btn-outline-secondary btn-sm" })
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width:500px;">
+    <div class="card-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger py-2 small" })
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.UserName)
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Enter username" })
+                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger small" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Min 6 characters" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.ConfirmPassword)
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Re-enter password" })
+                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.UserRole)
+                @Html.DropDownListFor(m => m.UserRole, ViewBag.Roles as SelectList, "-- Select Role --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.UserRole, "", new { @class = "text-danger small" })
+                <small class="text-muted">Admin can manage users. Staff can manage products, customers and orders.</small>
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-switch">
+                    @Html.CheckBoxFor(m => m.IsActive, new { @class = "custom-control-input", id = "IsActive" })
+                    <label class="custom-control-label" for="IsActive">Account Active</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-user-plus mr-1"></i>Create User
+            </button>
+        }
+    </div>
+</div>

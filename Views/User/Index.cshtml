@@ -1,0 +1,82 @@
+@model IEnumerable<MyClothShopManagement.Models.ViewModels.UserListViewModel>
+@{
+    ViewBag.Title = "User Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="font-weight-bold mb-0">
+        <i class="fas fa-users-cog mr-2 text-primary"></i>User Management
+        <span class="badge badge-secondary ml-1" style="font-size:.7rem;">@Model.Count() users</span>
+    </h4>
+    @Html.ActionLink("+ Add New User", "Create", "User", null, new { @class = "btn btn-primary" })
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">@user.UserId</td>
+                            <td>
+                                <i class="fas fa-user-circle mr-2 text-muted"></i>
+                                <strong>@user.UserName</strong>
+                                @if (user.UserId == (int)Session["UserId"])
+                                {
+                                    <span class="badge badge-info ml-1" style="font-size:.7rem;">You</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @(user.UserRole == "Admin" ? "badge-dark" : "badge-secondary")">
+                                    @user.UserRole
+                                </span>
+                            </td>
+                            <td>
+                                @if (user.IsActive)
+                                {
+                                    <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                @Html.ActionLink("Reset Password", "ResetPassword", new { id = user.UserId },
+                                    new { @class = "btn btn-sm btn-outline-warning mr-1" })
+
+                                @if (user.UserId != (int)Session["UserId"])
+                                {
+                                    using (Html.BeginForm("ToggleActive", "User", new { id = user.UserId }, FormMethod.Post, new { style = "display:inline;" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+                                                onclick="return confirm('@(user.IsActive ? "Deactivate" : "Activate") user @user.UserName?')">
+                                            @(user.IsActive ? "Deactivate" : "Activate")
+                                        </button>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-3 small">
+    <i class="fas fa-info-circle mr-1"></i>
+    Only <strong>Admins</strong> can manage users. Staff accounts can log in and manage products, customers and orders but cannot access this page.
+</div>

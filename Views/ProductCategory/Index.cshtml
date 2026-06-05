@@ -1,0 +1,232 @@
+﻿@model IEnumerable <MyClothShopManagement.Models.ViewModels.ProductCategoryViewModel>
+
+@{
+    ViewBag.Title = "Product Categories";
+}
+
+<style>
+    .category-header {
+        background: linear-gradient(135deg, #1a3a52 0%, #2c5aa0 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .category-header h2 {
+        margin: 0;
+        font-weight: bold;
+        font-size: 2rem;
+    }
+
+    .category-header p {
+        margin-top: 10px;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .btn-create-category {
+        background: linear-gradient(135deg, #D4AF37 0%, #E6C547 100%);
+        color: #1a3a52;
+        border: none;
+        padding: 12px 30px;
+        font-weight: bold;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+        display: inline-block;
+        margin-bottom: 30px;
+    }
+
+    .btn-create-category:hover {
+        background: linear-gradient(135deg, #E6C547 0%, #D4AF37 100%);
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(212,175,55,0.5);
+        color: #1a3a52;
+        text-decoration: none;
+    }
+
+    .category-table-wrapper {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .category-table {
+        margin: 0;
+    }
+
+    .category-table thead {
+        background: #2c4a70;
+        color: white;
+    }
+
+    .category-table thead th {
+        border: none;
+        padding: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .category-table tbody tr {
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .category-table tbody tr:hover {
+        background-color: #f8f9fa;
+        box-shadow: inset 5px 0 0 #D4AF37;
+    }
+
+    .category-table tbody td {
+        padding: 20px;
+        vertical-align: middle;
+    }
+
+    .btn-edit-category {
+        background: #D4AF37;
+        color: #1a3a52;
+        border: none;
+        padding: 8px 20px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        margin-right: 5px;
+        font-size: 0.85rem;
+    }
+
+    .btn-edit-category:hover {
+        background: #E6C547;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(212,175,55,0.3);
+        color: #1a3a52;
+        text-decoration: none;
+    }
+
+    .btn-delete-category {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        font-weight: 600;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+    }
+
+    .btn-delete-category:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(231,76,60,0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    .no-categories {
+        text-align: center;
+        padding: 50px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+        border-radius: 10px;
+        border: 2px dashed #d4af37;
+    }
+
+    .no-categories i {
+        font-size: 3rem;
+        color: #d4af37;
+        margin-bottom: 20px;
+    }
+
+    .no-categories p {
+        font-size: 1.1rem;
+        color: #666;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="category-header">
+        <h2><i class="fas fa-tags"></i> Product Categories</h2>
+        <p>Manage your fashion categories efficiently</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("+ Create New Category", "Create", null, new { @class = "btn-create-category" })
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="category-table-wrapper">
+            <table class="table table-hover category-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-folder"></i> @Html.DisplayNameFor(model => model.CategoryName)</th>
+                        <th><i class="fas fa-align-left"></i> @Html.DisplayNameFor(model => model.CategoryDescription)</th>
+                        <th style="width: 200px; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@Html.DisplayFor(modelItem => item.CategoryName)</strong></td>
+                            <td>@Html.DisplayFor(modelItem => item.CategoryDescription)</td>
+                            <td style="text-align: center;">
+                                @Html.ActionLink("Edit", "Edit", new { id = item.ProductCategoryId }, new { @class = "btn-edit-category" })
+                                @Html.ActionLink("Delete", "Delete", new { id = item.ProductCategoryId }, new { @class = "btn-delete-category" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="no-categories">
+            <i class="fas fa-inbox"></i>
+            <p>No categories found. <a href="@Url.Action("Create")" style="color: #d4af37; font-weight: bold;">Create one now!</a></p>
+        </div>
+    }
+</div>

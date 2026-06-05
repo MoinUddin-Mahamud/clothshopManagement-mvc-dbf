@@ -1,0 +1,28 @@
+# Build output
+bin/
+obj/
+
+# NuGet packages (restored automatically on build)
+packages/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local database files
+*.mdf
+*.ldf
+App_Data/*.mdf
+App_Data/*.ldf
+
+# Uploaded product images (local only)
+Images/*
+!Images/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,73 @@
+@model MyClothShopManagement.Models.ViewModels.CustomerViewModel
+@{
+    ViewBag.Title = "Customer Details";
+    var orders = ViewBag.Orders as IEnumerable<MyClothShopManagement.Models.Order>;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="font-weight-bold mb-0"><i class="fas fa-user mr-2 text-primary"></i>Customer Profile</h4>
+    @Html.ActionLink("← Back", "Index", "Customer", null, new { @class = "btn btn-outline-secondary btn-sm" })
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm text-center p-4">
+            <div class="mb-3">
+                <div style="width:80px;height:80px;background:#e8f0fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                    <i class="fas fa-user fa-2x text-primary"></i>
+                </div>
+            </div>
+            <h5 class="font-weight-bold">@Model.CustomerName</h5>
+            <p class="text-muted mb-1"><i class="fas fa-phone mr-1"></i>@Model.ContactNumber</p>
+            <p class="text-muted small mb-3"><i class="fas fa-map-marker-alt mr-1"></i>@Model.ContactAddress</p>
+            <hr />
+            <div class="row text-center">
+                <div class="col-6">
+                    <div class="h4 font-weight-bold text-primary mb-0">@Model.OrderCount</div>
+                    <small class="text-muted">Orders</small>
+                </div>
+                <div class="col-6">
+                    <div class="h5 font-weight-bold text-success mb-0">@Model.TotalSpent.ToString("N0")</div>
+                    <small class="text-muted">Total Spent</small>
+                </div>
+            </div>
+            <hr />
+            <small class="text-muted">Member since @(Model.CreatedDate?.ToString("dd MMM yyyy") ?? "N/A")</small>
+            <div class="mt-3">
+                @Html.ActionLink("Edit Customer", "Edit", new { id = Model.CustomerId }, new { @class = "btn btn-warning btn-sm btn-block" })
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h6 class="mb-0 font-weight-bold"><i class="fas fa-history mr-2 text-primary"></i>Order History</h6></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="thead-light">
+                            <tr><th>#</th><th>Date</th><th>Amount</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            @if (orders == null || !orders.Any())
+                            {
+                                <tr><td colspan="4" class="text-center text-muted py-4">No orders placed yet.</td></tr>
+                            }
+                            else
+                            {
+                                foreach (var o in orders)
+                                {
+                                    <tr>
+                                        <td><span class="badge badge-light border">#@o.OrderId</span></td>
+                                        <td class="text-muted small">@o.OrderDate?.ToString("dd MMM yyyy")</td>
+                                        <td class="text-success font-weight-bold">@o.TotalAmount.ToString("N0")</td>
+                                        <td>@Html.ActionLink("View", "Edit", "Order", new { id = o.OrderId }, new { @class = "btn btn-sm btn-outline-secondary" })</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

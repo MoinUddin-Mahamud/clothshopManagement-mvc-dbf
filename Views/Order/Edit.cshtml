@@ -1,0 +1,492 @@
+﻿@model MyClothShopManagement.Models.ViewModels.SalesMasterViewModel
+
+@{
+    ViewBag.Title = "Edit Order";
+}
+
+<div class="container mt-4">
+    <h2>Edit Order #@Model.OrderId</h2>
+    <hr />
+
+    @using (Html.BeginForm("Edit", "Order", FormMethod.Post, new { @id = "orderForm" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.SaleId)
+        @Html.HiddenFor(model => model.OrderId)
+        @Html.HiddenFor(model => model.CustomerId)
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        
+        <!-- Hidden field to store initial category ID -->
+        <input type="hidden" id="hdnInitialCategoryId" value="@(Model.SalesDetailsList != null && Model.SalesDetailsList.Any() ? Model.SalesDetailsList.First().ProductCategoryId : 0)" />
+
+        <!-- Section 1: Customer Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">1. Customer Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CustomerName)
+                            @Html.EditorFor(model => model.CustomerName, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Phone)
+                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Address)
+                            @Html.TextAreaFor(model => model.Address, new { @class = "form-control", rows = 2 })
+                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Add Products -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">2. Add/Update Products</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Product Category</label>
+                            <select id="ddlCategory" class="form-control">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Product</label>
+                            <select id="ddlProduct" class="form-control">
+                                <option value="">-- Select Product --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Order Quantity</label>
+                            <input type="number" id="txtOrderQuantity" class="form-control" min="1" value="1" />
+                            <small id="availableQtyText" class="text-muted"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Unit</label>
+                            <input type="text" id="txtOrderUnit" class="form-control" readonly />
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Unit Price</label>
+                            <input type="text" id="txtUnitPrice" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" id="btnAddProduct" class="btn btn-primary">
+                            <i class="fa fa-plus"></i> Add Product
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Order Details List -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">3. Order Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="tblOrderDetails">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Category</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                                <th>Unit Price</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderDetailsBody">
+                            <tr id="noDataRow">
+                                <td colspan="7" class="text-center text-muted">No products added yet</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5" class="text-right">Total Amount:</th>
+                                <th id="totalAmount">0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden field for order details -->
+        <input type="hidden" id="hdnOrderDetails" name="OrderDetailsListJson" />
+
+        <!-- Submit Button -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-lg btn-success">
+                <i class="fa fa-save"></i> Update Order
+            </button>
+            @Html.ActionLink("Back to Orders", "Index", null, new { @class = "btn btn-lg btn-secondary" })
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+<script type="text/javascript">
+var orderDetailsList = @Html.Raw(Json.Encode(Model.SalesDetailsList ?? new List<MyClothShopManagement.Models.ViewModels.SalesDetailsViewModel>()));
+
+$(document).ready(function () {
+    console.log('Document ready');
+    loadCategories();
+    renderOrderDetailsTable();
+
+    // Load products if category is already selected
+    setTimeout(function () {
+        console.log('Checking for initial category');
+        var selectedCategoryId = $('#hdnInitialCategoryId').val();
+        console.log('Initial Category ID:', selectedCategoryId);
+        if (selectedCategoryId && selectedCategoryId != '0') {
+            $('#ddlCategory').val(selectedCategoryId);
+            console.log('Category set to:', selectedCategoryId);
+            loadProducts(parseInt(selectedCategoryId));
+        }
+    }, 200);
+
+    // Category change event
+    $('#ddlCategory').change(function () {
+        var categoryId = $(this).val();
+        console.log('Category changed to:', categoryId);
+        if (categoryId) {
+            loadProducts(parseInt(categoryId));
+        } else {
+            $('#ddlProduct').html('<option value="">-- Select Product --</option>');
+            clearProductFields();
+        }
+    });
+
+    // Product change event
+    $('#ddlProduct').change(function () {
+        var productId = $(this).val();
+        console.log('Product changed to:', productId);
+        if (productId) {
+            loadProductDetails(parseInt(productId));
+        } else {
+            clearProductFields();
+        }
+    });
+
+    // Add product button click
+    $('#btnAddProduct').click(function (e) {
+        e.preventDefault();
+        addProductToOrder();
+    });
+
+    // Form submit
+    $('#orderForm').submit(function (e) {
+        console.log('Form submit initiated');
+        console.log('Order details list length:', orderDetailsList.length);
+        console.log('SaleId:', $('#OrderId').val());
+        
+        if (orderDetailsList.length === 0) {
+            e.preventDefault();
+            alert('Please add at least one product to the order.');
+            return false;
+        }
+
+        var orderDetailsJson = JSON.stringify(orderDetailsList);
+        console.log('JSON to be sent:', orderDetailsJson);
+        $('#hdnOrderDetails').val(orderDetailsJson);
+        
+        console.log('Form will be submitted for update');
+        return true;
+    });
+});
+
+function loadCategories() {
+    try {
+        var categories = @Html.Raw(Json.Encode(ViewBag.ProductCategories));
+        console.log('Categories loaded:', categories);
+        var options = '<option value="">-- Select Category --</option>';
+        $.each(categories, function (index, category) {
+            options += '<option value="' + category.Value + '">' + category.Text + '</option>';
+        });
+        $('#ddlCategory').html(options);
+        console.log('Categories HTML set');
+    } catch (e) {
+        console.error('Error in loadCategories:', e);
+    }
+}
+
+function loadProducts(categoryId) {
+    console.log('loadProducts called with categoryId:', categoryId);
+    
+    $.ajax({
+        url: '@Url.Action("GetProductsByCategory", "Order")',
+        type: 'GET',
+        data: { categoryId: categoryId },
+        dataType: 'json',
+        timeout: 5000,
+        success: function (data) {
+            console.log('Products response received:', data);
+            
+            var products = data;
+            if (data && data.success === false) {
+                console.error('Server returned error:', data.message);
+                alert('Error loading products: ' + data.message);
+                return;
+            }
+            
+            var options = '<option value="">-- Select Product --</option>';
+            
+            if (Array.isArray(products) && products.length > 0) {
+                console.log('Products array length:', products.length);
+                $.each(products, function (index, product) {
+                    console.log('Adding product:', product.ProductName);
+                    options += '<option value="' + product.ProductId + '" data-unit="' + (product.Unit || '') + '" data-price="' + product.UnitPrice + '" data-qty="' + product.AvailableQuantity + '">' + product.ProductName + '</option>';
+                });
+            } else {
+                console.warn('No products returned or data is not an array');
+                options += '<option value="">No products available</option>';
+            }
+            
+            $('#ddlProduct').html(options);
+            console.log('Product dropdown HTML updated');
+            clearProductFields();
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX Error - Status:', status);
+            console.error('AJAX Error - Error:', error);
+            console.error('AJAX Error - Response:', xhr.responseText);
+            $('#ddlProduct').html('<option value="">-- Select Product --</option><option value="">Error loading products</option>');
+            alert('Error loading products. Check browser console for details.');
+        }
+    });
+}
+
+function loadProductDetails(productId) {
+    console.log('loadProductDetails called with productId:', productId);
+    
+    $.ajax({
+        url: '@Url.Action("GetProductDetails", "Order")',
+        type: 'GET',
+        data: { productId: productId },
+        dataType: 'json',
+        timeout: 5000,
+        success: function (response) {
+            console.log('Product details response:', response);
+            
+            if (response && response.success) {
+                console.log('Setting product details - unit:', response.unit, 'price:', response.unitPrice);
+                
+                // Set Unit
+                var unitValue = response.unit || 'Pcs';
+                $('#txtOrderUnit').val(unitValue);
+                console.log('Unit set to:', unitValue);
+                
+                // Set Unit Price
+                $('#txtUnitPrice').val(parseFloat(response.unitPrice).toFixed(2));
+                console.log('Unit Price set to:', parseFloat(response.unitPrice).toFixed(2));
+                
+                // Set max quantity available
+                $('#txtOrderQuantity').attr('max', response.availableQuantity);
+                $('#availableQtyText').text('Available: ' + response.availableQuantity);
+                console.log('Available quantity:', response.availableQuantity);
+            } else {
+                console.warn('Product details response not successful');
+                clearProductFields();
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error loading product details:', error);
+            console.error('Response:', xhr.responseText);
+            clearProductFields();
+        }
+    });
+}
+
+function clearProductFields() {
+    $('#txtOrderUnit').val('');
+    $('#txtUnitPrice').val('');
+    $('#txtOrderQuantity').val('1');
+    $('#availableQtyText').text('');
+}
+
+function addProductToOrder() {
+    var categoryId = $('#ddlCategory').val();
+    var categoryName = $('#ddlCategory option:selected').text();
+    var productId = $('#ddlProduct').val();
+    var productName = $('#ddlProduct option:selected').text();
+    var orderQuantity = parseInt($('#txtOrderQuantity').val());
+    var orderUnit = $('#txtOrderUnit').val();
+    var unitPrice = parseFloat($('#txtUnitPrice').val());
+    var availableQty = parseInt($('#ddlProduct option:selected').data('qty'));
+
+    // Validation
+    if (!categoryId || categoryId === '') {
+        alert('Please select a category');
+        return false;
+    }
+    if (!productId || productId === '') {
+        alert('Please select a product');
+        return false;
+    }
+    if (!orderQuantity || orderQuantity <= 0) {
+        alert('Please enter a valid quantity');
+        return false;
+    }
+
+    // Check if product already exists in list
+    var existingIndex = -1;
+    for (var i = 0; i < orderDetailsList.length; i++) {
+        if (orderDetailsList[i].ProductId === parseInt(productId)) {
+            existingIndex = i;
+            break;
+        }
+    }
+
+    var amount = orderQuantity * unitPrice;
+
+    if (existingIndex !== -1) {
+        // Update existing product
+        orderDetailsList[existingIndex].OrderQuantity = orderQuantity;
+        orderDetailsList[existingIndex].Quantity = orderQuantity;
+        orderDetailsList[existingIndex].Amount = amount;
+    } else {
+        // Add new product
+        var orderDetail = {
+            OrderDetailsId: 0,
+            OrderId: @Model.OrderId,
+            ProductCategoryId: parseInt(categoryId),
+            CategoryName: categoryName,
+            ProductId: parseInt(productId),
+            ProductName: productName,
+            OrderQuantity: orderQuantity,
+            Quantity: orderQuantity,
+            OrderUnit: orderUnit,
+            Unit: orderUnit,
+            UnitPrice: unitPrice,
+            Amount: amount,
+            AvailableQuantity: availableQty
+        };
+        orderDetailsList.push(orderDetail);
+    }
+
+    renderOrderDetailsTable();
+    clearForm();
+    return false;
+}
+
+function renderOrderDetailsTable() {
+    var tbody = $('#orderDetailsBody');
+    tbody.empty();
+
+    if (orderDetailsList.length === 0) {
+        tbody.append('<tr id="noDataRow"><td colspan="7" class="text-center text-muted">No products added yet</td></tr>');
+        $('#totalAmount').text('0.00');
+        return;
+    }
+
+    var total = 0;
+    $.each(orderDetailsList, function (index, item) {
+        var row = '<tr>' +
+            '<td>' + item.CategoryName + '</td>' +
+            '<td>' + item.ProductName + '</td>' +
+            '<td>' + item.OrderQuantity + '</td>' +
+            '<td>' + item.OrderUnit + '</td>' +
+            '<td>' + parseFloat(item.UnitPrice).toFixed(2) + '</td>' +
+            '<td>' + parseFloat(item.Amount).toFixed(2) + '</td>' +
+            '<td>' +
+            '<button type="button" class="btn btn-sm btn-warning" onclick="editProduct(' + index + '); return false;">Edit</button> ' +
+            '<button type="button" class="btn btn-sm btn-danger" onclick="deleteProduct(' + index + '); return false;">Delete</button>' +
+            '</td>' +
+            '</tr>';
+        tbody.append(row);
+        total += item.Amount;
+    });
+
+    $('#totalAmount').text(parseFloat(total).toFixed(2));
+}
+
+function editProduct(index) {
+    console.log('editProduct called with index:', index);
+    var item = orderDetailsList[index];
+    console.log('Editing item:', item);
+    
+    // Set category and load products
+    $('#ddlCategory').val(item.ProductCategoryId);
+    console.log('Category set to:', item.ProductCategoryId);
+    
+    // Load products for this category
+    loadProducts(item.ProductCategoryId);
+    
+    // Set product and load details after a delay to allow products to load
+    setTimeout(function () {
+        console.log('Setting product to:', item.ProductId);
+        $('#ddlProduct').val(item.ProductId);
+        
+        // Load product details
+        loadProductDetails(item.ProductId);
+        
+        // Set quantity
+        setTimeout(function () {
+            console.log('Setting quantity to:', item.OrderQuantity);
+            $('#txtOrderQuantity').val(item.OrderQuantity);
+        }, 300);
+    }, 500);
+
+    // Remove from list (will be re-added when user clicks Add)
+    orderDetailsList.splice(index, 1);
+    renderOrderDetailsTable();
+    console.log('Item removed from list for editing');
+    return false;
+}
+
+function deleteProduct(index) {
+    if (confirm('Are you sure you want to remove this product?')) {
+        orderDetailsList.splice(index, 1);
+        renderOrderDetailsTable();
+    }
+    return false;
+}
+
+function clearForm() {
+    $('#ddlCategory').val('');
+    $('#ddlProduct').html('<option value="">-- Select Product --</option>');
+    clearProductFields();
+}
+</script>
+}
+
+<style>
+    .card-header h4 {
+        margin: 0;
+    }
+
+    #tblOrderDetails tbody tr td {
+        vertical-align: middle;
+    }
+</style>

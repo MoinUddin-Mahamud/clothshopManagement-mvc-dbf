@@ -1,0 +1,150 @@
+﻿@model MyClothShopManagement.Models.ViewModels.MyClothProductViewModel
+
+@{
+    ViewBag.Title = "Create Product";
+}
+
+<div class="container mt-4">
+    <h2>Create Product</h2>
+    <hr />
+
+    @using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.ProductName, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.ProductCategoryId, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList("ProductCategoryId", null, "-- Select Category --", new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.ProductCategoryId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.Size, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Size, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Size, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.Color, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Color, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Color, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.Unit, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.UnitPrice, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.UnitPrice, new { htmlAttributes = new { @class = "form-control", type = "number", step = "0.01" } })
+            @Html.ValidationMessageFor(model => model.UnitPrice, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.AvailableQuantity, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.AvailableQuantity, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+            @Html.ValidationMessageFor(model => model.AvailableQuantity, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        @Html.LabelFor(model => model.ImageFile, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <div class="custom-file">
+                <input type="file" id="ImageFileInput" name="ImageFile" class="custom-file-input" />
+                <label class="custom-file-label" for="ImageFileInput" id="FileLabel">Choose file</label>
+            </div>
+            <small class="form-text text-muted">Max file size: 5MB</small>
+            <div id="ImagePreview" style="margin-top: 10px; display:none;">
+                <img id="PreviewImage" src="" alt="Image Preview" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" />
+            </div>
+            @Html.ValidationMessageFor(model => model.ImageFile, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-offset-2 col-md-10">
+            <div class="form-check">
+                @Html.CheckBoxFor(model => model.IsActive, new { @class = "form-check-input" })
+                @Html.LabelFor(model => model.IsActive, new { @class = "form-check-label" })
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-success" />
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+</div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            // Handle file selection and display
+            $('#ImageFileInput').on('change', function () {
+                var fileName = $(this).val().split('\\').pop();
+                $('#FileLabel').text(fileName || 'Choose file');
+
+                // Show preview if file is selected
+                if (this.files && this.files[0]) {
+                    var file = this.files[0];
+                    
+                    // Validate file size (5MB)
+                    var maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                    if (file.size > maxSize) {
+                        alert('File size cannot exceed 5MB. Your file is ' + Math.round(file.size / 1024 / 1024 * 100) / 100 + 'MB');
+                        $('#ImageFileInput').val('');
+                        $('#FileLabel').text('Choose file');
+                        $('#ImagePreview').hide();
+                        return;
+                    }
+
+                    // Show image preview
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#PreviewImage').attr('src', e.target.result);
+                        $('#ImagePreview').show();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#ImagePreview').hide();
+                }
+            });
+
+            // Add Bootstrap custom-file styling
+            $('.custom-file-input').on('change', function () {
+                var fileName = $(this).val().split('\\').pop() || 'Choose file';
+                $(this).siblings('.custom-file-label').text(fileName);
+            });
+        });
+    </script>
+}

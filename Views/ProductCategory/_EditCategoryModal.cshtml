@@ -1,0 +1,96 @@
+@model MyClothShopManagement.Models.ViewModels.ProductCategoryViewModel
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="editCategoryLabel">
+                    <i class="fas fa-edit"></i> Edit Category
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editCategoryForm" method="post">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.ProductCategoryId)
+
+                    <div class="form-group">
+                        <label for="CategoryName">@Html.DisplayNameFor(m => m.CategoryName) <span class="text-danger">*</span></label>
+                        @Html.TextBoxFor(m => m.CategoryName, new { @class = "form-control", placeholder = "Enter category name" })
+                        @Html.ValidationMessageFor(m => m.CategoryName, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="CategoryDescription">@Html.DisplayNameFor(m => m.CategoryDescription)</label>
+                        @Html.TextAreaFor(m => m.CategoryDescription, new { @class = "form-control", rows = 4 })
+                        @Html.ValidationMessageFor(m => m.CategoryDescription, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <div class="form-check">
+                        @Html.CheckBoxFor(m => m.IsActive)
+                        <label class="form-check-label" for="IsActive">
+                            @Html.DisplayNameFor(m => m.IsActive)
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-save"></i> Update Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        function editCategory(categoryId) {
+            $.ajax({
+                url: '@Url.Action("EditAjax", "ProductCategory")/' + categoryId,
+                type: 'GET',
+                success: function (data) {
+                    if (data.success) {
+                        var category = data.data;
+                        $('#editCategoryForm')[0].reset();
+                        $('#editCategoryForm').find('[name="ProductCategoryId"]').val(category.productCategoryId);
+                        $('#editCategoryForm').find('[name="CategoryName"]').val(category.categoryName);
+                        $('#editCategoryForm').find('[name="CategoryDescription"]').val(category.categoryDescription);
+                        $('#editCategoryForm').find('[name="IsActive"]').prop('checked', category.isActive);
+                        $('#editCategoryModal').modal('show');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                },
+                error: function () {
+                    alert('Failed to load category data');
+                }
+            });
+        }
+
+        $('#editCategoryForm').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '@Url.Action("EditAjax", "ProductCategory")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        $('#editCategoryModal').modal('hide');
+                        alert('Category updated successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,42 @@
+﻿@model MyClothShopManagement.Models.ViewModels.MyClothProductViewModel
+
+<div class="card h-100 shadow-sm" id="product-@Model.ProductId">
+    @if (!string.IsNullOrEmpty(Model.ProductImage))
+    {
+        <img src="@Url.Content("~/Images/" + Model.ProductImage)" class="card-img-top" alt="@Model.ProductName" style="height: 200px; object-fit: cover;">
+    }
+    else
+    {
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+            <i class="fas fa-image fa-3x"></i>
+        </div>
+    }
+
+    <div class="card-body">
+        <h5 class="card-title">@Model.ProductName</h5>
+        <p class="card-text small">
+            <strong>Category:</strong> @Model.CategoryName<br />
+            <strong>Unit:</strong> @Model.Unit<br />
+            <strong>Price:</strong> <span class="text-success">@Model.UnitPrice</span><br />
+            <strong>Stock:</strong> <span class="badge badge-info">@Model.AvailableQuantity</span><br />
+            <strong>Status:</strong>
+            <span id="status-badge-@Model.ProductId" class="badge badge-@(Model.IsActive ? "success" : "danger")">
+                @(Model.IsActive ? "Active" : "Inactive")
+            </span>
+        </p>
+    </div>
+
+    <div class="card-footer bg-transparent">
+        <button type="button" class="btn btn-sm btn-info btn-block mb-2" onclick="toggleStatus(@Model.ProductId)">
+            <i class="fas fa-toggle-on"></i> Status
+        </button>
+        <div class="btn-group w-100" role="group">
+            <a href="@Url.Action("Edit", "Product", new { id = Model.ProductId })" class="btn btn-sm btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="@Url.Action("Delete", "Product", new { id = Model.ProductId })" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+</div>

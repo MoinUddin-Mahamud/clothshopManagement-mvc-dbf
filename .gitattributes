@@ -1,0 +1,4 @@
+*.js linguist-vendored=true
+*.css linguist-vendored=true
+Scripts/* linguist-vendored=true
+Content/* linguist-vendored=true

@@ -1,0 +1,231 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #1a3a52 0%, #2c5aa0 50%, #D4AF37 100%);
+        color: white;
+        padding: 80px 20px;
+        border-radius: 10px;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        text-align: center;
+    }
+    
+    .hero-section h1 {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+    }
+    
+    .hero-section p {
+        font-size: 1.3rem;
+        margin-bottom: 30px;
+        opacity: 0.95;
+    }
+    
+    .feature-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .feature-card-header {
+        background: linear-gradient(135deg, #1a3a52 0%, #2c5aa0 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .feature-card-header i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: #D4AF37;
+    }
+    
+    .feature-card-header h3 {
+        font-size: 1.8rem;
+        margin: 0;
+        font-weight: bold;
+    }
+    
+    .feature-card-body {
+        padding: 25px;
+    }
+    
+    .feature-card-body p {
+        color: #666;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    .cta-button {
+        background: linear-gradient(135deg, #D4AF37 0%, #E6C547 100%);
+        color: #1a3a52;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(212,175,55,0.4);
+    }
+    
+    .cta-button:hover {
+        background: linear-gradient(135deg, #E6C547 0%, #D4AF37 100%);
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(212,175,55,0.6);
+        color: #1a3a52;
+        text-decoration: none;
+    }
+    
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #1a3a52;
+        margin-bottom: 50px;
+        position: relative;
+        padding-bottom: 20px;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, #1a3a52, #D4AF37);
+        border-radius: 2px;
+    }
+    
+    .stats-box {
+        background: linear-gradient(135deg, #2c5aa0 0%, #1a3a52 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .stats-box h3 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #D4AF37;
+        margin: 0;
+    }
+    
+    .stats-box p {
+        font-size: 1.1rem;
+        margin-top: 10px;
+        margin-bottom: 0;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Welcome to One Fashion</h1>
+    <p>Your Ultimate Fashion Management Solution</p>
+    <a href="@Url.Action("Index", "Product")" class="btn cta-button" style="margin-right: 15px;">
+        <i class="fas fa-shopping-bag"></i> Shop Now
+    </a>
+    <a href="@Url.Action("Create", "Order")" class="btn cta-button">
+        <i class="fas fa-plus-circle"></i> Place Order
+    </a>
+</div>
+
+<!-- Features Section -->
+<div class="section-title">Why Choose One Fashion?</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-card-header">
+                <i class="fas fa-tshirt"></i>
+                <h3>Premium Quality</h3>
+            </div>
+            <div class="feature-card-body">
+                <p>We offer the finest selection of clothing items curated for your style and comfort. Each piece is carefully selected to ensure quality and durability.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-card-header">
+                <i class="fas fa-bolt"></i>
+                <h3>Fast Delivery</h3>
+            </div>
+            <div class="feature-card-body">
+                <p>Quick and reliable order processing ensures your fashion items reach you on time. We manage inventory efficiently for faster fulfillment.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="feature-card">
+            <div class="feature-card-header">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 Support</h3>
+            </div>
+            <div class="feature-card-body">
+                <p>Our dedicated support team is always ready to assist you. From product queries to order management, we've got you covered around the clock.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="section-title" style="margin-top: 60px;">Our Performance</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stats-box">
+            <h3>500+</h3>
+            <p>Products Available</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stats-box">
+            <h3>10K+</h3>
+            <p>Happy Customers</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stats-box">
+            <h3>100%</h3>
+            <p>Authentic Items</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stats-box">
+            <h3>24/7</h3>
+            <p>Customer Support</p>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action Section -->
+<div style="background: linear-gradient(135deg, #1a3a52 0%, #2c5aa0 100%); color: white; padding: 60px 40px; border-radius: 15px; text-align: center; margin-top: 60px; margin-bottom: 40px;">
+    <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-weight: bold;">Ready to Explore Fashion?</h2>
+    <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.95;">Browse our latest collection and find your perfect style today!</p>
+    <a href="@Url.Action("Index", "Product")" class="btn cta-button btn-lg">
+        <i class="fas fa-search"></i> Browse All Products
+    </a>
+</div>
